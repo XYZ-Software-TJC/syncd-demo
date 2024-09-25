@@ -175,7 +175,7 @@ export function Triggers() {
                       </Card>
                     </DialogTrigger>
                     {provider.isConnected && (
-                      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                      <DialogContent className="max-h-[70vh] max-w-2xl overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>
                             Add {provider.displayName} Trigger
@@ -275,7 +275,7 @@ export function Triggers() {
                             Edit Trigger
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                        <DialogContent className="max-h-[60vh] max-w-2xl overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>
                               Edit {trigger.accessor} Trigger

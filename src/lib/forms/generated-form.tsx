@@ -538,7 +538,7 @@ export function GeneratedForm({
 
       const defaultValue =
         defaultValueFromSchema ??
-        typeDefaultValues[type as keyof typeof typeDefaultValues] ??
+        typeDefaultValues[type!] ??
         typeDefaultValues.default;
 
       return {

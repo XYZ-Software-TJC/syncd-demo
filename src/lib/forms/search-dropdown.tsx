@@ -1,6 +1,7 @@
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import type { ControllerRenderProps, FieldValues } from "react-hook-form";
+import { Button } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -15,7 +16,6 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
-import { Button } from "~/components/ui/button";
 
 interface EnumOption {
   title: string;
@@ -58,7 +58,6 @@ export function SearchSingleSelectDropdown({
             <CommandGroup>
               {data?.map((option) => (
                 <CommandItem
-                  label={option.title}
                   value={option.title}
                   key={option.title}
                   onSelect={() => {

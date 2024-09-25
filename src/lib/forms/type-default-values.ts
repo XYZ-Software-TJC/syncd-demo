@@ -1,6 +1,4 @@
-export const typeDefaultValues: {
-  [key: string]: unknown;
-} = {
+export const typeDefaultValues: Record<string, unknown> = {
   array: [],
   object: {},
   string: "",
