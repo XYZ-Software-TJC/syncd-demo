@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   type Control,
   type FieldErrors,
+  type FieldValues,
   type UseFormGetValues,
 } from "react-hook-form";
 
@@ -20,19 +21,19 @@ import {
   type FormSchemaProperty,
 } from "./syncd-forms.types";
 
+import axios from "axios";
 import { Skeleton } from "~/components/ui/skeleton";
 import { generateJSX } from "./generated-form";
-import axios from "axios";
 
 const getAsyncEnums = async (
   data: AsyncEnums,
-  getValues: UseFormGetValues<any>,
+  getValues: UseFormGetValues<FieldValues>,
 ): Promise<EnumOption[]> => {
   try {
     const { path, dataKeys } = data;
 
     const params: Record<string, string> = {};
-    for (const [key, _] of Object.entries(dataKeys)) {
+    for (const [key] of Object.entries(dataKeys)) {
       const valueToUse = getValues(key) as string | undefined;
       if (valueToUse) {
         params[key] = String(valueToUse);
@@ -41,17 +42,16 @@ const getAsyncEnums = async (
 
     const mergedParams = {
       ...params,
-      projectId: process.env.NEXT_PUBLIC_SYNCD_PROJECT_ID!,
-      externalId: user.id,
       path,
     };
 
-    const res = await axios.post<EnumOption[]>("/api/syncd/forms/helpers", {
+    const res = await axios.post<EnumOption[]>("/api/helpers", {
       mergedParams,
     });
 
     return res.data;
   } catch (error) {
+    console.error(error);
     throw new Error("Error trying to fetch async enums");
   }
 };
@@ -63,16 +63,15 @@ export function AsyncComponent({
   value,
   control,
   getValues,
-  errors,
 }: {
   _key: string;
   widget: string;
   value: FormSchemaProperty;
   title: string;
-  control: Control<any>;
-  getValues: UseFormGetValues<any>;
+  control: Control<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
   getAccessToken?: (provider: string) => Promise<string>;
-  errors: FieldErrors<any>;
+  errors: FieldErrors<FieldValues>;
 }) {
   const isAsync = !Array.isArray(value.enums);
 
@@ -82,25 +81,27 @@ export function AsyncComponent({
   );
 
   const [isLoading, setIsLoading] = useState(isAsync ? true : false);
-  const [error, setError] = useState<Error | null>(null);
+  // const [error, setError] = useState<Error | null>(null);
 
   const asyncFetch = useCallback(async () => {
     setIsLoading(true);
-    setError(null);
+    // setError(null);
     try {
       const res = await getAsyncEnums(value.enums as AsyncEnums, getValues);
 
       setData(res);
     } catch (err) {
       console.log(err);
-      setError(err as Error);
+      // setError(err as Error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    isAsync && asyncFetch();
+    if (isAsync) {
+      void asyncFetch();
+    }
   }, []);
 
   if (isLoading && isAsync)

@@ -18,7 +18,7 @@ export async function Nav() {
             alt="Flowbite Logo"
           />
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-            Syncd
+            Syncd Demo
           </span>
         </a>
         <div className="flex flex-row items-center gap-2 space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">

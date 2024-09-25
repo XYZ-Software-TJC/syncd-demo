@@ -27,19 +27,18 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
-import { typeDefaultValues } from "./type-default-values";
 import { AsyncComponent } from "./async-component";
 import { SearchSingleSelectDropdown } from "./search-dropdown";
 import {
   type EnumOption,
   type FormSchema,
-  type FormSchemaProperty,
   type GenerateJSXProps,
   type GetZodSchemaByTypeProps,
   type PruneAndScrubFormProps,
   type RenderFieldProps,
   type UISchema,
 } from "./syncd-forms.types";
+import { typeDefaultValues } from "./type-default-values";
 
 /**
  * Generates a Zod schema based on the field type and optional parameters
@@ -587,8 +586,8 @@ export function GeneratedForm({
           <Fragment key={name}>
             {renderField({
               name,
-              schema: formSchema.properties[name] as FormSchemaProperty,
-              uiSchema: uiSchema[name],
+              schema: formSchema.properties[name] as unknown as FormSchema,
+              uiSchema: uiSchema[name] as unknown as UISchema,
               getValues: form.getValues,
               control: form.control,
               errors: form.formState.errors,

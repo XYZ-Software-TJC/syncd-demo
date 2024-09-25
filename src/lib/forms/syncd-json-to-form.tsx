@@ -10,7 +10,7 @@ export const syncdJsonToForm = (jsonFromSyncdApi: {
   };
   callbackId?: string;
   isEditSubmit?: boolean;
-  handleSubmit: (data: Record<string, unknown>) => void;
+  handleSubmit: (data: Record<string, unknown>) => Promise<void>;
 }) => {
   return {
     providerName: jsonFromSyncdApi.provider.name,
@@ -22,8 +22,9 @@ export const syncdJsonToForm = (jsonFromSyncdApi: {
         buttonText={
           jsonFromSyncdApi.isEditSubmit ? "Update Trigger" : "Create Trigger"
         }
-        _onSubmit={() => {}}
-        // _onSubmit={jsonFromSyncdApi.handleSubmit}
+        _onSubmit={async (data) => {
+          await jsonFromSyncdApi.handleSubmit(data);
+        }}
       />
     ),
   };

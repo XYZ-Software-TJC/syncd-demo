@@ -198,9 +198,11 @@ export const syncdRouter = createTRPCRouter({
     .input(
       z.object({
         provider: z.string(),
-        data: z.object({
-          triggers: z.array(z.string()).optional(),
-        }),
+        data: z
+          .object({
+            triggers: z.array(z.string()).optional(),
+          })
+          .passthrough(),
         isEditSubmit: z.boolean(),
         callbackId: z.string(),
       }),
@@ -216,11 +218,14 @@ export const syncdRouter = createTRPCRouter({
             callbackUrl: process.env.SYNCD_WEBHOOK_CALLBACK_URL,
           },
         };
+
         const triggerDataSchema = z.object({
           triggers: z.array(z.string()).optional(),
           triggerData: z.record(z.any()),
         });
+
         const parsedDataToSubmit = triggerDataSchema.parse(dataToSubmit);
+
         const formRes = await syncdNodeClient.api.request.post<{
           endpointId: string;
           message: string;
@@ -247,21 +252,28 @@ export const syncdRouter = createTRPCRouter({
   getPreFilledForm: protectedProcedure
     .input(
       z.object({
-        accessor: z.string(),
+        provider: z.string(),
         callbackId: z.string(),
       }),
     )
-    .query(async ({ ctx, input }) => {
-      const { accessor, callbackId } = input;
+    .mutation(async ({ ctx, input }) => {
+      const { provider, callbackId } = input;
 
       try {
         const response = await syncdNodeClient.api.request.get<{
-          formattedForm: unknown;
+          formattedForm: {
+            formSchema: Record<string, unknown>;
+            provider: {
+              name: string;
+              description: string;
+            };
+            uiSchema: Record<string, unknown>;
+          };
         }>("/v1/forms/pre-filled", {
           params: {
             projectId: env.SYNCD_PROJECT_ID,
             externalId: ctx.session.user.id,
-            provider: accessor,
+            provider: provider.toLowerCase(),
             callbackId: callbackId,
           },
         });

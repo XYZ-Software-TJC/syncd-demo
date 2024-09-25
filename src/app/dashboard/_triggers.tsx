@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -35,13 +36,14 @@ export function Triggers() {
     api.syncd.getAllAllowedProviders.useQuery({
       onlyTriggers: true,
     });
-
   const { data: allTriggers, isLoading: isLoadingAllTriggers } =
     api.syncd.getAllTriggersForUser.useQuery();
 
   // Mutations
   const { mutateAsync: generateTrigger } =
     api.syncd.generateSingleForm.useMutation();
+  const { mutateAsync: generatePreFilledForm } =
+    api.syncd.getPreFilledForm.useMutation();
   const { mutateAsync: submitTrigger } =
     api.syncd.submitTriggerData.useMutation();
 
@@ -56,10 +58,14 @@ export function Triggers() {
       const trigger = await generateTrigger({ provider });
       const form = syncdJsonToForm({
         ...trigger,
-        handleSubmit: () => {},
+        handleSubmit: async (data) => {
+          await handleSubmitTrigger({
+            data,
+            isEditSubmit: false,
+            provider: trigger.provider.name.toLowerCase(),
+          });
+        },
       });
-
-      console.log(trigger);
 
       setForm(form);
     } catch (error) {
@@ -67,26 +73,45 @@ export function Triggers() {
     }
   };
 
-  const handleSubmitTrigger = async (data: any) => {
+  // Handlers
+  const handleEditTrigger = async (provider: string, callbackId: string) => {
     try {
-      await submitTrigger({
-        data,
-        isEditSubmit: data.isEditSubmit ?? false,
-        provider: data.provider.name.toLowerCase(),
-        callbackId: data.callbackId ?? "",
+      const trigger = await generatePreFilledForm({ provider, callbackId });
+      const form = syncdJsonToForm({
+        ...trigger,
+        handleSubmit: async (data) => {
+          await handleSubmitTrigger({
+            data,
+            isEditSubmit: true,
+            provider: trigger.provider.name.toLowerCase(),
+            callbackId,
+          });
+        },
       });
+
+      setForm(form);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEditTrigger = async (data: any) => {
+  const handleSubmitTrigger = async ({
+    data,
+    isEditSubmit,
+    provider,
+    callbackId,
+  }: {
+    data: Record<string, unknown>;
+    isEditSubmit: boolean;
+    provider: string;
+    callbackId?: string;
+  }) => {
     try {
       await submitTrigger({
         data,
-        isEditSubmit: true,
-        provider: data.provider.name.toLowerCase(),
-        callbackId: data.callbackId ?? "",
+        isEditSubmit: isEditSubmit ?? false,
+        provider: provider.toLowerCase(),
+        callbackId: callbackId ?? "",
       });
     } catch (error) {
       console.error(error);
@@ -115,7 +140,12 @@ export function Triggers() {
                   </Card>
                 ))
               : allProviders?.map((provider) => (
-                  <Dialog key={provider.provider}>
+                  <Dialog
+                    key={provider.provider}
+                    onOpenChange={() => {
+                      setForm(null);
+                    }}
+                  >
                     <DialogTrigger asChild>
                       <Card
                         className={`flex h-[200px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white shadow-none transition-all duration-200 ${
@@ -145,7 +175,7 @@ export function Triggers() {
                       </Card>
                     </DialogTrigger>
                     {provider.isConnected && (
-                      <DialogContent>
+                      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>
                             Add {provider.displayName} Trigger
@@ -194,26 +224,82 @@ export function Triggers() {
           ) : (
             <Accordion type="single" collapsible className="w-full">
               {allTriggers?.map((trigger, index) => (
-                <AccordionItem key={trigger.id} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
-                    <div className="flex items-center gap-4">
-                      <Image
-                        alt={trigger.accessor}
-                        src={`https://syncdpublic.dev/logos/${trigger.accessor.toLowerCase()}.svg`}
-                        width={24}
-                        height={24}
-                      />
-                      <span>{trigger.accessor}</span>
+                <AccordionItem
+                  key={trigger.id}
+                  value={`item-${index}`}
+                  className="mb-4 rounded-lg border"
+                >
+                  <AccordionTrigger className="px-4 py-2 text-left">
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Image
+                          alt={trigger.accessor}
+                          src={`https://syncdpublic.dev/logos/${trigger.accessor.toLowerCase()}.svg`}
+                          width={24}
+                          height={24}
+                        />
+                        <span>{trigger.accessor}</span>
+                      </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent>
+                  <AccordionContent className="border-t border-dashed bg-gray-50 p-4">
                     <div className="mt-2 space-y-2">
                       <p>
                         <strong>Provider:</strong> {trigger.accessor}
                       </p>
                       <p>
-                        <strong>Endpoint Id:</strong> {trigger.id}
+                        <strong>Endpoint ID:</strong> {trigger.id}
                       </p>
+                      <Dialog
+                        onOpenChange={() => {
+                          setForm(null);
+                        }}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            onClick={async () => {
+                              await handleEditTrigger(
+                                trigger.accessor,
+                                trigger.id,
+                              );
+                            }}
+                            disabled={
+                              !allProviders?.find(
+                                (provider) =>
+                                  provider.provider.toLowerCase() ===
+                                  trigger.accessor.toLowerCase(),
+                              )?.isConnected
+                            }
+                          >
+                            Edit Trigger
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>
+                              Edit {trigger.accessor} Trigger
+                            </DialogTitle>
+                            <DialogDescription>
+                              Modify the settings for your {trigger.accessor}{" "}
+                              trigger.
+                            </DialogDescription>
+                          </DialogHeader>
+                          {form ? (
+                            form.form
+                          ) : (
+                            <div className="space-y-4">
+                              <Skeleton className="h-8 w-full" />
+                              <Skeleton className="h-24 w-full" />
+                              <Skeleton className="h-8 w-3/4" />
+                              <Skeleton className="h-8 w-1/2" />
+                              <div className="flex justify-end">
+                                <Skeleton className="h-10 w-24" />
+                              </div>
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
