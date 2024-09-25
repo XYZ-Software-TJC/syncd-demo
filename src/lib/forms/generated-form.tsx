@@ -267,7 +267,7 @@ export const generateJSX = ({
         <Select
           onValueChange={field.onChange}
           disabled={disabled ?? false}
-          defaultValue={defaultValue ?? field.value}
+          defaultValue={(defaultValue as string) ?? (field.value as string)}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select an option" />
@@ -286,9 +286,9 @@ export const generateJSX = ({
     case "Checkbox":
       return (
         <Checkbox
-          checked={field.value}
+          checked={field.value as boolean}
           onCheckedChange={field.onChange}
-          defaultChecked={defaultValue}
+          defaultChecked={defaultValue as boolean}
         />
       );
     default:
@@ -386,20 +386,20 @@ const renderField = ({
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
                           <Checkbox
-                            defaultChecked={
-                              items?.defaultValue?.includes(
-                                item.title.toLowerCase(),
-                              ) as boolean
-                            }
-                            checked={field.value?.includes(item.title)}
+                            defaultChecked={(
+                              items?.defaultValue as string[]
+                            )?.includes(item.title.toLowerCase())}
+                            checked={(field.value as string[])?.includes(
+                              item.title,
+                            )}
                             onCheckedChange={(checked) => {
                               return checked
                                 ? field.onChange([
-                                    ...(field.value || []),
+                                    ...(field.value as string[]),
                                     item.title,
                                   ])
                                 : field.onChange(
-                                    (field.value || []).filter(
+                                    (field.value as string[]).filter(
                                       (value: string) => value !== item.title,
                                     ),
                                   );
@@ -443,7 +443,7 @@ const renderField = ({
                 field={field}
               />
             </FormControl>
-            <FormMessage>{errors[name]?.message}</FormMessage>
+            <FormMessage>{errors[name]?.message as string}</FormMessage>
           </FormItem>
         )}
       />,
@@ -467,7 +467,7 @@ const renderField = ({
                 defaultValue: defaultFieldValue as string,
               })}
             </FormControl>
-            <FormMessage>{errors[name]?.message}</FormMessage>
+            <FormMessage>{errors[name]?.message as string}</FormMessage>
           </FormItem>
         )}
       />,
@@ -516,7 +516,7 @@ export function GeneratedForm({
       // We need to add this because we have nested allOf properties
       if (property?.allOf) {
         property.allOf.forEach((condition) => {
-          if (condition.then && condition.then.properties) {
+          if (condition?.then?.properties) {
             Object.entries(condition.then.properties).forEach(
               ([thenKey, thenValue]) => {
                 if ("defaultValue" in thenValue) {
@@ -530,7 +530,7 @@ export function GeneratedForm({
       }
 
       // Handle array type with items
-      if (type === "array" && property && property?.items) {
+      if (type === "array" && property?.items) {
         if (property.items.defaultValue) {
           defaultValueFromSchema = property.items.defaultValue;
         }
@@ -586,8 +586,8 @@ export function GeneratedForm({
           <Fragment key={name}>
             {renderField({
               name,
-              schema: formSchema.properties[name] as unknown as FormSchema,
-              uiSchema: uiSchema[name] as unknown as UISchema,
+              schema: formSchema.properties[name]!,
+              uiSchema: uiSchema[name]!,
               getValues: form.getValues,
               control: form.control,
               errors: form.formState.errors,
