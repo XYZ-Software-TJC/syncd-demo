@@ -1,5 +1,5 @@
-import { toast } from "sonner";
 import { GeneratedForm } from "./generated-form";
+import type { FormSchema, UISchema } from "./syncd-forms.types";
 
 export const syncdJsonToForm = (jsonFromSyncdApi: {
   formSchema: Record<string, unknown>;
@@ -10,42 +10,20 @@ export const syncdJsonToForm = (jsonFromSyncdApi: {
   };
   callbackId?: string;
   isEditSubmit?: boolean;
-  handleCloseDialog?: () => void;
+  handleSubmit: (data: Record<string, unknown>) => void;
 }) => {
   return {
     providerName: jsonFromSyncdApi.provider.name,
     providerDescription: jsonFromSyncdApi.provider.description,
     form: (
       <GeneratedForm
-        formSchema={jsonFromSyncdApi.formSchema}
-        uiSchema={jsonFromSyncdApi.uiSchema}
-        buttonText={jsonFromSyncdApi.isEditSubmit ? "Update" : "Connect"}
-        _onSubmit={async (data) => {
-          const promise = fetch("/api/syncd/forms/submit", {
-            method: "POST",
-            body: JSON.stringify({
-              data,
-              isEditSubmit: jsonFromSyncdApi.isEditSubmit ?? false,
-              provider: jsonFromSyncdApi.provider.name.toLowerCase(),
-              callbackId: jsonFromSyncdApi.callbackId,
-            }),
-          });
-
-          toast.promise(promise, {
-            loading: `${
-              jsonFromSyncdApi.isEditSubmit ? "Updating" : "Creating"
-            } ${jsonFromSyncdApi.provider.name} Webhook`,
-            success: () => {
-              jsonFromSyncdApi.handleCloseDialog?.();
-              return `${jsonFromSyncdApi.provider.name} Webhook ${
-                jsonFromSyncdApi.isEditSubmit ? "Updated" : "Created"
-              }`;
-            },
-            error: `Error ${
-              jsonFromSyncdApi.isEditSubmit ? "Updating" : "Creating"
-            } ${jsonFromSyncdApi.provider.name} Webhook`,
-          });
-        }}
+        formSchema={jsonFromSyncdApi.formSchema as unknown as FormSchema}
+        uiSchema={jsonFromSyncdApi.uiSchema as UISchema}
+        buttonText={
+          jsonFromSyncdApi.isEditSubmit ? "Update Trigger" : "Create Trigger"
+        }
+        _onSubmit={() => {}}
+        // _onSubmit={jsonFromSyncdApi.handleSubmit}
       />
     ),
   };

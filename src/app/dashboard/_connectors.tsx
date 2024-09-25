@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
-
 import Image from "next/image";
 
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,20 +11,32 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { api } from "~/trpc/react";
 import { Skeleton } from "~/components/ui/skeleton";
-import { toast } from "sonner";
+import { api } from "~/trpc/react";
 
 const CARD_HEIGHT = 300;
+const REDIRECT_URL = "http://localhost:3000/dashboard";
 export function Connectors() {
+  // Query Client
+  const queryClient = api.useUtils();
+
+  // Queries
   const { data: allProviders, isLoading: isLoadingAllProviders } =
-    api.syncd.getAllAllowedProviders.useQuery();
+    api.syncd.getAllAllowedProviders.useQuery({});
+
+  // Mutations
   const { mutateAsync: generateConnectUrl } =
     api.syncd.generateConnectUrl.useMutation();
+  const { mutateAsync: removeConnection, isPending: isRemovingConnection } =
+    api.syncd.removeConnection.useMutation();
 
+  // Functions
   const handleConnect = async (provider: string) => {
     try {
-      const { redirectUrl } = await generateConnectUrl({ provider });
+      const { redirectUrl } = await generateConnectUrl({
+        provider,
+        customRedirectUrl: REDIRECT_URL,
+      });
 
       if (redirectUrl) {
         window.location.href = redirectUrl;
@@ -38,12 +49,29 @@ export function Connectors() {
     }
   };
 
+  const handleDisconnect = async (provider: string) => {
+    try {
+      const promise = () => removeConnection({ provider });
+
+      toast.promise(promise, {
+        loading: "Disconnecting...",
+        success: async () => {
+          await queryClient.syncd.getAllAllowedProviders.invalidate();
+          return "Disconnected";
+        },
+        error: "Error disconnecting",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <Card x-chunk="dashboard-06-chunk-0">
+    <Card>
       <CardHeader>
-        <CardTitle>Integrations</CardTitle>
+        <CardTitle>Connectors</CardTitle>
         <CardDescription>
-          Manage your integrations and view their performance.
+          You can connect and disconnect providers with a couple lines of code.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -96,28 +124,28 @@ export function Connectors() {
                         <span className="text-sm text-gray-500">
                           {provider.about}
                         </span>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="text-xs font-semibold text-gray-500">
-                            SDK Supported:
-                          </span>
-                          {provider.hasTriggers && (
-                            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                              Triggers
-                            </span>
-                          )}
-                          {provider.hasActions && (
-                            <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
-                              Actions
-                            </span>
-                          )}
-                        </div>
                       </CardDescription>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-500">
+                          SDK Supported:
+                        </span>
+                        {provider.hasTriggers && (
+                          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            Triggers
+                          </span>
+                        )}
+                        {provider.hasActions && (
+                          <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
+                            Actions
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2 border-t pt-4">
                       <Button
-                        variant="default"
+                        variant="secondary"
                         className={
                           provider.isConnected
                             ? "w-full bg-green-600 text-white hover:bg-green-600"
@@ -129,9 +157,10 @@ export function Connectors() {
                         {provider.isConnected ? "Connected" : "Connect"}
                       </Button>
                       <Button
-                        variant="secondary"
+                        variant="ghost"
                         className="w-full"
-                        disabled={!provider.isConnected}
+                        disabled={!provider.isConnected || isRemovingConnection}
+                        onClick={() => handleDisconnect(provider.provider)}
                       >
                         Disconnect
                       </Button>

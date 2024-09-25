@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight } from "lucide-react";
 import { Nav } from "~/components/nav";
 
@@ -26,9 +24,9 @@ export default function DashboardComponent() {
             <span className="text-indigo-600">Minutes</span>, not Months
           </h1>
           <p className="mb-10 text-xl leading-8 text-gray-600">
-            Syncd transforms how you connect, collect, and react to webhook
-            events. Let us handle getting you the data, so you can focus on what
-            matters most.
+            Syncd handles all the stuff you don&apos;t want to - authentication,
+            refresh tokens, rate limiting, basic auth, idiosynchratic API
+            requirements, etc.
           </p>
           <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <a

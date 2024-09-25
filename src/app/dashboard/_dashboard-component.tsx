@@ -1,17 +1,16 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import {
   Home,
   LineChart,
   Package,
   Package2,
   PanelLeft,
-  Settings,
   ShoppingCart,
   Users2,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   Breadcrumb,
@@ -30,6 +29,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 
+import type { Session } from "next-auth";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   Tooltip,
@@ -37,14 +38,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Actions } from "./_actions";
 import { Connectors } from "./_connectors";
 import { Triggers } from "./_triggers";
-import type { Session } from "next-auth";
-import { Actions } from "./_actions";
-import { useRouter } from "next/navigation";
 
 export function Dashboard({ session }: { session: Session }) {
   const router = useRouter();
+
   return (
     <TooltipProvider>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">

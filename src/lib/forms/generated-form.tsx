@@ -581,7 +581,7 @@ export function GeneratedForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(_onSubmit)}
-        className="w-full space-y-2"
+        className="flex w-full flex-col gap-2"
       >
         {Object.keys(formSchema.properties).map((name) => (
           <Fragment key={name}>
@@ -595,7 +595,11 @@ export function GeneratedForm({
             })}
           </Fragment>
         ))}
-        <Button type="submit">{buttonText}</Button>
+
+        <Button type="submit" className="mt-4 self-end">
+          {buttonText}
+        </Button>
+
         {Object.keys(form.formState.errors || {}).length > 0 && (
           <Card className="text-red-7000 bg-red-50">
             <CardHeader>

@@ -1,9 +1,11 @@
-import {
+import type {
   Control,
   ControllerRenderProps,
+  FieldErrors,
+  FieldValues,
   UseFormGetValues,
 } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 
 /**
  * Represents an option in an enum field
@@ -16,9 +18,7 @@ export interface EnumOption {
 export interface AsyncEnums {
   path: string;
   provider?: string;
-  dataKeys: {
-    [key: string]: string | number | boolean | null;
-  };
+  dataKeys: Record<string, string | number | boolean | null>;
 }
 
 /**
@@ -41,7 +41,7 @@ export interface FormSchemaProperty {
   type: string;
   title: string;
   errorMessage?: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
   description?: string;
   disabled?: boolean;
   minLength?: number;
@@ -65,24 +65,25 @@ export interface FormSchema {
 /**
  * Represents the UI schema for customizing form field appearance
  */
-export type UISchema = {
-  [key: string]: {
+export type UISchema = Record<
+  string,
+  {
     "ui:widget": string;
     "ui:placeholder"?: string;
     "ui:type"?: string;
     "ui:custom"?: string;
-  };
-};
+  }
+>;
 
 /**
  * Props for generating JSX elements for form fields
  */
 export type GenerateJSXProps = {
-  field: ControllerRenderProps<any, string>;
+  field: ControllerRenderProps<FieldValues, string>;
   widget: string;
   disabled?: boolean;
   enums?: EnumOption[];
-  defaultValue?: any;
+  defaultValue?: unknown;
 };
 
 /**
@@ -92,11 +93,9 @@ export type RenderFieldProps = {
   name: string;
   schema: FormSchemaProperty;
   uiSchema: UISchema[keyof UISchema];
-  control: Control<any>;
-  errors: any;
-  getValues: UseFormGetValues<{
-    [x: string]: any;
-  }>;
+  control: Control<FieldValues>;
+  errors: FieldErrors<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 };
 
 /**
@@ -104,7 +103,7 @@ export type RenderFieldProps = {
  */
 export interface ConditionalRule {
   field: string;
-  condition: (getValues: any) => boolean;
+  condition: (getValues: UseFormGetValues<FieldValues>) => boolean;
 }
 
 /**
@@ -129,11 +128,7 @@ export interface PruneAndScrubFormProps {
     Record<string, z.ZodTypeAny>,
     "strip",
     z.ZodTypeAny,
-    {
-      [x: string]: any;
-    },
-    {
-      [x: string]: any;
-    }
+    FieldValues,
+    FieldValues
   >;
 }

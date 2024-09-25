@@ -1,8 +1,7 @@
 import Image from "next/image";
-import React from "react";
-import { buttonVariants } from "./ui/button";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
+import { buttonVariants } from "./ui/button";
 export async function Nav() {
   return (
     <nav className="fixed start-0 top-0 z-20 w-full border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900">

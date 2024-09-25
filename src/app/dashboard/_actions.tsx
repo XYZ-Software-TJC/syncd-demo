@@ -1,17 +1,7 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { api } from "~/trpc/react";
-import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "sonner";
 import {
   Accordion,
@@ -19,10 +9,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
+import { api } from "~/trpc/react";
 
 export function Actions() {
   const { data: allProviders, isLoading: isLoadingAllProviders } =
-    api.syncd.getAllAllowedProviders.useQuery();
+    api.syncd.getAllAllowedProviders.useQuery({});
 
   const handleAction = async (provider: string, action: string) => {
     try {
@@ -37,11 +36,11 @@ export function Actions() {
   };
 
   return (
-    <Card x-chunk="dashboard-06-chunk-0">
+    <Card>
       <CardHeader>
-        <CardTitle>Provider Actions</CardTitle>
+        <CardTitle>Actions</CardTitle>
         <CardDescription>
-          Perform various actions with your connected providers.
+          This tab only shows actions (no triggers) that Syncd supports.
         </CardDescription>
       </CardHeader>
       <CardContent>
