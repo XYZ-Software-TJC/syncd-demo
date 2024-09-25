@@ -1,67 +1,51 @@
-import Link from "next/link";
+"use client";
 
-import { LatestPost } from "~/app/_components/post";
-import { getServerAuthSession } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { ArrowRight } from "lucide-react";
+import { Nav } from "~/components/nav";
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await getServerAuthSession();
-
-  void api.post.getLatest.prefetch();
-
+export default function DashboardComponent() {
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+    <div>
+      <Nav />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-indigo-50 to-white px-4 py-12 sm:px-6 lg:px-8">
+        <div className="max-w-3xl text-center">
+          <div className="mb-8">
+            <a
+              href="#"
+              className="inline-flex items-center space-x-2 rounded-full bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-700 transition duration-300 hover:bg-indigo-200"
+            >
+              <span className="font-semibold">What&apos;s new</span>
+              <span className="inline-flex items-center space-x-1">
+                <span>Just shipped v0.1.0</span>
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
+            </a>
+          </div>
+          <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+            Native User Facing Integrations in{" "}
+            <span className="text-indigo-600">Minutes</span>, not Months
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
+          <p className="mb-10 text-xl leading-8 text-gray-600">
+            Syncd transforms how you connect, collect, and react to webhook
+            events. Let us handle getting you the data, so you can focus on what
+            matters most.
+          </p>
+          <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <a
+              href="https://docs.syncd.dev"
+              className="w-full rounded-md bg-indigo-600 px-8 py-3 text-base font-medium text-white shadow-sm transition duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
             >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
+              View Documentation
+            </a>
+            <a
+              href="#"
+              className="w-full rounded-md border border-indigo-600 px-8 py-3 text-base font-medium text-indigo-600 transition duration-300 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
             >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
+              Get Started
+            </a>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-            </div>
-          </div>
-
-          {session?.user && <LatestPost />}
         </div>
-      </main>
-    </HydrateClient>
+      </div>
+    </div>
   );
 }
