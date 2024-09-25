@@ -72,9 +72,20 @@ export function Actions() {
                       <div key={action} className="mb-2 flex items-center">
                         <span className="mr-2 h-2 w-2 rounded-full bg-gray-400"></span>
                         <button
-                          className="text-sm text-blue-600 hover:underline"
+                          className={`text-sm ${
+                            provider.isConnected
+                              ? "text-blue-600 hover:underline"
+                              : "cursor-not-allowed text-gray-400"
+                          }`}
                           onClick={() =>
+                            provider.isConnected &&
                             handleAction(provider.provider, action)
+                          }
+                          disabled={!provider.isConnected}
+                          title={
+                            provider.isConnected
+                              ? action
+                              : "Connect to enable this action"
                           }
                         >
                           {action}

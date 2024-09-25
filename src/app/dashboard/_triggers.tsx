@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Image from "next/image";
 
+import { toast } from "sonner";
 import {
   Accordion,
   AccordionContent,
@@ -24,13 +25,15 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 import { Skeleton } from "~/components/ui/skeleton";
 import { syncdJsonToForm } from "~/lib/forms/syncd-json-to-form";
 import { api } from "~/trpc/react";
 
 export function Triggers() {
+  // Query Client
+  const queryClient = api.useUtils();
+
   // Queries
   const { data: allProviders, isLoading: isLoadingAllProviders } =
     api.syncd.getAllAllowedProviders.useQuery({
@@ -38,6 +41,7 @@ export function Triggers() {
     });
   const { data: allTriggers, isLoading: isLoadingAllTriggers } =
     api.syncd.getAllTriggersForUser.useQuery();
+  const { mutateAsync: deleteTrigger } = api.syncd.deleteTrigger.useMutation();
 
   // Mutations
   const { mutateAsync: generateTrigger } =
@@ -51,9 +55,12 @@ export function Triggers() {
   const [form, setForm] = useState<{
     form: JSX.Element;
   } | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   // Handlers
   const handleAddTrigger = async (provider: string) => {
+    setDialogOpen(true);
     try {
       const trigger = await generateTrigger({ provider });
       const form = syncdJsonToForm({
@@ -75,6 +82,7 @@ export function Triggers() {
 
   // Handlers
   const handleEditTrigger = async (provider: string, callbackId: string) => {
+    setEditDialogOpen(true);
     try {
       const trigger = await generatePreFilledForm({ provider, callbackId });
       const form = syncdJsonToForm({
@@ -82,14 +90,31 @@ export function Triggers() {
         handleSubmit: async (data) => {
           await handleSubmitTrigger({
             data,
+            callbackId,
             isEditSubmit: true,
             provider: trigger.provider.name.toLowerCase(),
-            callbackId,
           });
         },
       });
 
       setForm(form);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteTrigger = async (provider: string, callbackId: string) => {
+    try {
+      const promise = () => deleteTrigger({ provider, callbackId });
+
+      toast.promise(promise, {
+        loading: "Removing trigger...",
+        success: async () => {
+          await queryClient.syncd.invalidate();
+          return "Disconnected";
+        },
+        error: "Failed to remove trigger",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -107,11 +132,22 @@ export function Triggers() {
     callbackId?: string;
   }) => {
     try {
-      await submitTrigger({
-        data,
-        isEditSubmit: isEditSubmit ?? false,
-        provider: provider.toLowerCase(),
-        callbackId: callbackId ?? "",
+      const promise = () =>
+        submitTrigger({
+          data,
+          isEditSubmit: isEditSubmit ?? false,
+          provider: provider.toLowerCase(),
+          callbackId: callbackId ?? "",
+        });
+
+      toast.promise(promise, {
+        loading: "Processing request...",
+        success: async () => {
+          await queryClient.syncd.invalidate();
+          setDialogOpen(false);
+          return "Request processed successfully";
+        },
+        error: "Failed to process request",
       });
     } catch (error) {
       console.error(error);
@@ -142,38 +178,38 @@ export function Triggers() {
               : allProviders?.map((provider) => (
                   <Dialog
                     key={provider.provider}
-                    onOpenChange={() => {
+                    open={dialogOpen}
+                    onOpenChange={(open) => {
+                      setDialogOpen(open);
                       setForm(null);
                     }}
                   >
-                    <DialogTrigger asChild>
-                      <Card
-                        className={`flex h-[200px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white shadow-none transition-all duration-200 ${
-                          provider.isConnected
-                            ? "cursor-pointer hover:border-primary/50 hover:bg-gray-50"
-                            : "cursor-not-allowed opacity-50"
-                        }`}
-                        onClick={() =>
-                          provider.isConnected &&
-                          handleAddTrigger(provider.provider)
-                        }
-                      >
-                        <Image
-                          alt={provider.displayName}
-                          src={`https://syncdpublic.dev/logos/${provider.provider.toLowerCase()}.svg`}
-                          width={40}
-                          height={40}
-                        />
-                        <CardTitle className="mt-4 text-lg font-medium text-gray-900">
-                          {provider.isConnected
-                            ? "+ Add Trigger"
-                            : "Please Connect Provider"}
-                        </CardTitle>
-                        <CardDescription className="mt-2 text-sm text-gray-500">
-                          {provider.displayName}
-                        </CardDescription>
-                      </Card>
-                    </DialogTrigger>
+                    <Card
+                      className={`flex h-[200px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white shadow-none transition-all duration-200 ${
+                        provider.isConnected
+                          ? "cursor-pointer hover:border-primary/50 hover:bg-gray-50"
+                          : "cursor-not-allowed opacity-50"
+                      }`}
+                      onClick={() =>
+                        provider.isConnected &&
+                        handleAddTrigger(provider.provider)
+                      }
+                    >
+                      <Image
+                        alt={provider.displayName}
+                        src={`https://syncdpublic.dev/logos/${provider.provider.toLowerCase()}.svg`}
+                        width={40}
+                        height={40}
+                      />
+                      <CardTitle className="mt-4 text-lg font-medium text-gray-900">
+                        {provider.isConnected
+                          ? "+ Add Trigger"
+                          : "Please Connect Provider"}
+                      </CardTitle>
+                      <CardDescription className="mt-2 text-sm text-gray-500">
+                        {provider.displayName}
+                      </CardDescription>
+                    </Card>
                     {provider.isConnected && (
                       <DialogContent className="max-h-[70vh] max-w-2xl overflow-y-auto">
                         <DialogHeader>
@@ -251,30 +287,50 @@ export function Triggers() {
                         <strong>Endpoint ID:</strong> {trigger.id}
                       </p>
                       <Dialog
-                        onOpenChange={() => {
+                        open={editDialogOpen}
+                        onOpenChange={(open) => {
+                          setEditDialogOpen(open);
                           setForm(null);
                         }}
                       >
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            onClick={async () => {
-                              await handleEditTrigger(
-                                trigger.accessor,
-                                trigger.id,
-                              );
-                            }}
-                            disabled={
-                              !allProviders?.find(
-                                (provider) =>
-                                  provider.provider.toLowerCase() ===
-                                  trigger.accessor.toLowerCase(),
-                              )?.isConnected
-                            }
-                          >
-                            Edit Trigger
-                          </Button>
-                        </DialogTrigger>
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            await handleEditTrigger(
+                              trigger.accessor,
+                              trigger.id,
+                            );
+                          }}
+                          disabled={
+                            !allProviders?.find(
+                              (provider) =>
+                                provider.provider.toLowerCase() ===
+                                trigger.accessor.toLowerCase(),
+                            )?.isConnected
+                          }
+                        >
+                          Edit Trigger
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="ml-2"
+                          variant="destructive"
+                          onClick={async () => {
+                            await handleDeleteTrigger(
+                              trigger.accessor,
+                              trigger.id,
+                            );
+                          }}
+                          disabled={
+                            !allProviders?.find(
+                              (provider) =>
+                                provider.provider.toLowerCase() ===
+                                trigger.accessor.toLowerCase(),
+                            )?.isConnected
+                          }
+                        >
+                          Remove Trigger
+                        </Button>
                         <DialogContent className="max-h-[60vh] max-w-2xl overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>

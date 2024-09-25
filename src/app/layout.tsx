@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <Toaster closeButton />
+        <Toaster closeButton duration={2000} />
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>
