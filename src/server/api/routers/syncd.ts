@@ -341,4 +341,60 @@ export const syncdRouter = createTRPCRouter({
         });
       }
     }),
+
+  executeAction: protectedProcedure
+    .input(
+      z.object({
+        provider: z.string(),
+        actionConfig: z.record(z.any()).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        let actionType: string;
+
+        // Set actionType based on the provider
+        switch (input.provider.toLowerCase()) {
+          case "dropbox":
+            actionType = "listFiles";
+            break;
+          case "github":
+            actionType = "listUsersOrganizations";
+            break;
+          case "figma":
+            actionType = "getTeamProjects";
+            break;
+          case "jira":
+            actionType = "getProjectsList";
+            break;
+          case "notion":
+            actionType = "searchDatabases";
+            break;
+          case "airtable":
+            actionType = "getBasesList";
+            break;
+          default:
+            throw new Error(`Unsupported provider: ${input.provider}`);
+        }
+
+        const res = await syncdNodeClient.api.request.post<unknown>(
+          "/v1/actions/execute",
+          {
+            projectId: env.SYNCD_PROJECT_ID,
+            provider: input.provider,
+            externalId: ctx.session.user.id,
+            actionConfig: input.actionConfig,
+            actionType,
+          },
+        );
+
+        return res.data;
+      } catch (error) {
+        console.error(error);
+        throw new TRPCError({
+          message: "Error executing action",
+          code: "BAD_REQUEST",
+        });
+      }
+    }),
 });
