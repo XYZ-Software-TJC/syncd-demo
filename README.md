@@ -70,6 +70,21 @@ cp .env.example .env
 
    ![Discord Authentication Helper](public/discord-helper.png)
 
+## Setting Up Your Providers in the Dashboard
+
+Before using the Syncd SDK, you need to set up your providers in the Syncd dashboard. Follow these steps:
+
+1. Log in to your Syncd dashboard.
+2. Navigate to the "Providers" section.
+3. For each provider you want to use (e.g., Discord, GitHub), toggle the switch to enable it.
+4. Enter the required `client_id` and `client_secret` for each enabled provider.
+
+Here's an example of what the provider setup looks like in the Syncd dashboard:
+
+![Syncd Dashboard Project Settings](public/syncd-dashboard-project.png)
+
+Make sure to save your changes after configuring each provider.
+
 ## Usage
 
 To use the Syncd SDK in your project, follow these steps:
@@ -94,3 +109,20 @@ export const syncdNodeClient = new SyncdSdk({
   apiUrl: env.SYNCD_API_URL,
 });
 ```
+
+## Important Note on SDK Usage
+
+This application demonstrates the integration of the Syncd SDK, which is primarily designed as a Node.js SDK. However, for the purposes of this example repository, we leverage the SDK's API feature. This approach allows developers to:
+
+1. Interact directly with the Syncd API
+2. Explore and understand the available API endpoints
+3. Examine the required parameters and pathnames for each API call
+4. Test API responses in a controlled environment
+
+By utilizing the SDK's API feature, this example provides a comprehensive overview of the Syncd API's capabilities without the need for a full Node.js backend implementation. This setup is ideal for developers who want to:
+
+- Quickly prototype Syncd integrations
+- Understand the API structure before full implementation
+- Test API responses in a frontend-focused environment
+
+Remember that in a production Node.js application, you would typically use the full range of SDK features for optimal performance and integration.
