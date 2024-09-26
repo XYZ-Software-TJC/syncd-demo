@@ -65,6 +65,7 @@ cp .env.example .env
    - Set up Syncd:
      - Get your Syncd API key and callback URL from the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/projects/<project-id>/project-settings)
      - Update `SYNCD_API_KEY` and `SYNCD_WEBHOOK_CALLBACK_URL` in your `.env` file
+     - The API url should already be in the `.env.example` file as `SYNCD_API_URL`
 
 3. A helper image (`discord-helper.png`) is included in the `public` directory to assist with Discord authentication implementation:
 
