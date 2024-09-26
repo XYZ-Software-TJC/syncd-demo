@@ -63,7 +63,7 @@ cp .env.example .env
      - Copy the Client ID and Client Secret
      - Update `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` in your `.env` file
    - Set up Syncd:
-     - Get your Syncd API key and callback URL from the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/projects/<project-id>/project-settings)
+     - Get your Syncd API key and callback URL from the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/)
      - Update `SYNCD_API_KEY` and `SYNCD_WEBHOOK_CALLBACK_URL` in your `.env` file
      - The API url should already be in the `.env.example` file as `SYNCD_API_URL`
 
