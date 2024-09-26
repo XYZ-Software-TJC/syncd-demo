@@ -1,29 +1,50 @@
-# Create T3 App
+# Syncd SDK Integration
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This project uses the Syncd SDK to enhance your application's functionality. Follow the steps below to set up and use the Syncd SDK in your project.
 
-## What's next? How do I make an app with this?
+## Installation
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+You can install the syncd-sdk using your preferred package manager. Choose one of the following commands:
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### Using pnpm
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+```bash
+pnpm add syncd-sdk
+```
 
-## Learn More
+### Using npm
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+```bash
+npm install syncd-sdk
+```
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Using yarn
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+```bash
+yarn add syncd-sdk
+```
 
-## How do I deploy this?
+## Usage
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+To use the Syncd SDK in your project, follow these steps:
+
+1. Import the SDK in your project:
+
+```javascript
+import { SyncdSdk } from "syncd-sdk";
+```
+
+2. Initialize the SDK with your project ID:
+
+```javascript
+import { SyncdSdk } from "syncd-sdk";
+
+export const syncdNodeClient = new SyncdSdk({
+  apiKey: env.SYNCD_API_KEY,
+
+  // Note: This is not a required field
+  // Defaults to use the PROD Syncd API
+  // DO NOT REMOVE FOR THE DEMO
+  apiUrl: env.SYNCD_API_URL,
+});
+```

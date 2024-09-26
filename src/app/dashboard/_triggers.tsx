@@ -144,7 +144,11 @@ export function Triggers() {
         loading: "Processing request...",
         success: async () => {
           await queryClient.syncd.invalidate();
-          setDialogOpen(false);
+          if (!isEditSubmit) {
+            setDialogOpen(false);
+          } else if (isEditSubmit) {
+            setEditDialogOpen(false);
+          }
           return "Request processed successfully";
         },
         error: "Failed to process request",

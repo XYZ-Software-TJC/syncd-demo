@@ -36,7 +36,7 @@ export default function DashboardComponent() {
               View Documentation
             </a>
             <a
-              href="#"
+              href="/dashboard"
               className="w-full rounded-md border border-indigo-600 px-8 py-3 text-base font-medium text-indigo-600 transition duration-300 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
             >
               Get Started
