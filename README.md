@@ -63,7 +63,7 @@ cp .env.example .env
      - Copy the Client ID and Client Secret
      - Update `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` in your `.env` file
    - Set up Syncd:
-     - Get your Syncd API key and callback URL from the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/)
+     - Get your Syncd API key (see the "Getting Your Syncd API Key" section below)
      - Update `SYNCD_API_KEY` and `SYNCD_WEBHOOK_CALLBACK_URL` in your `.env` file
      - The API url should already be in the `.env.example` file as `SYNCD_API_URL`
 
@@ -131,3 +131,19 @@ By utilizing the SDK's API feature, this example provides a comprehensive overvi
 - Test API responses in a frontend-focused environment
 
 Remember that in a production Node.js application, you would typically use the full range of SDK features for optimal performance and integration.
+
+## Getting Your Syncd API Key
+
+To obtain your Syncd API key, follow these steps:
+
+1. Log in to the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/).
+2. On the left sidebar, click on "Settings".
+3. In the Settings menu, select "API Keys".
+4. Click on the "Create API Key" button to generate a new API key.
+5. Copy the generated API key and paste it into your `.env` file as the value for `SYNCD_API_KEY`.
+
+Here's a visual guide to help you locate the API Keys section in the Syncd dashboard:
+
+![Syncd API Key Section](public/syncd-api-key.png)
+
+Remember to keep your API key secure and never share it publicly.
