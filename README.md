@@ -24,7 +24,7 @@ npm install
 yarn install
 ```
 
-### Then run this command to push the schema to the database:
+### Then run this command to push the schema to the local SQLite database:
 
 ```bash
 pnpm db:push
