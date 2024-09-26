@@ -70,6 +70,10 @@ cp .env.example .env
 
    ![Discord Authentication Helper](public/discord-helper.png)
 
+4. Syncd DEV Site and Login:
+   - The main DEV site URL is [https://syncd-www-dev.vercel.app/](https://syncd-www-dev.vercel.app/)
+   - Use the email we discussed for login to access the Syncd dashboard and features
+
 ## Setting Up Your Providers in the Dashboard
 
 Before using the Syncd SDK, you need to set up your providers in the Syncd dashboard. Follow these steps:
