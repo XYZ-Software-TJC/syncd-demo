@@ -66,7 +66,9 @@ cp .env.example .env
      - Get your Syncd API key and callback URL from the [Syncd dashboard](https://syncd-www-dev.vercel.app/dashboard/projects/<project-id>/project-settings)
      - Update `SYNCD_API_KEY` and `SYNCD_WEBHOOK_CALLBACK_URL` in your `.env` file
 
-3. A Discord logo image (`discord-helper.png`) is included in the `public` directory for use in the authentication UI.
+3. A helper image (`discord-helper.png`) is included in the `public` directory to assist with Discord authentication implementation:
+
+   ![Discord Authentication Helper](public/discord-helper.png)
 
 ## Usage
 
