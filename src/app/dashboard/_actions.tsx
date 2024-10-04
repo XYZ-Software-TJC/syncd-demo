@@ -226,6 +226,8 @@ function getProviderActions(provider: string): string[] {
       return ["List Bases"];
     case "dropbox":
       return ["List Files"];
+    case "intercom":
+      return ["List Closed Conversations"];
     default:
       return ["Connect"];
   }

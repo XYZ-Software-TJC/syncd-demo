@@ -373,6 +373,9 @@ export const syncdRouter = createTRPCRouter({
           case "airtable":
             actionType = "getBasesList";
             break;
+          case "intercom":
+            actionType = "listClosedConversations";
+            break;
           default:
             throw new Error(`Unsupported provider: ${input.provider}`);
         }
